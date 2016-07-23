@@ -1,3 +1,9 @@
+///////////////////////////////////////////////////////////
+//
+//@author Antonio David Lopez Machado
+//
+////////////////////////////////////////////////////////
+
 int IN3 = 5; 
 int IN4 = 4;
 int IN5 = 6;
@@ -11,7 +17,7 @@ int distancia=0;
 
 void setup()
 {
-  Serial.begin(9600);  
+  
   pinMode (IN3, OUTPUT);
   pinMode (IN4, OUTPUT);    
   pinMode (IN5, OUTPUT);
@@ -35,26 +41,26 @@ void loop()
   duracion=pulseIn(PIN_ECO,HIGH);
   //Realizamos el calculo en cm
   distancia=(duracion/2)/29;
-  Serial.println(distancia);
+  
+  //Reiniciamos los valores
+  digitalWrite (IN3, LOW);
+  digitalWrite (IN4, LOW);
+  digitalWrite (IN5, LOW);
+  digitalWrite (IN6, LOW);  
+  delay(200);
   
   //Si no tiene cercanos (50cm) 
   if(distancia >50 || distancia < 0){
     // Motor va hacia delante
-    digitalWrite (IN3, LOW);
     digitalWrite (IN4, HIGH);
-    digitalWrite (IN5, LOW);
     digitalWrite (IN6, HIGH);  
     delay(500);
   }
-  else {
+  else { //Si tenemos un obstaculo a menos de 50cm
     //Motor gira hacia la derecha
-    digitalWrite (IN3, HIGH); 
-    digitalWrite (IN4, LOW); 
-    digitalWrite (IN5, LOW);  
+    digitalWrite (IN3, HIGH);   
     digitalWrite (IN6, HIGH);
     delay(200);
   
   }
-  
-  delay(200);
 }
