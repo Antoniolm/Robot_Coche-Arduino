@@ -3,6 +3,7 @@
 //@author Antonio David Lopez Machado
 //
 ////////////////////////////////////////////////////////
+#include <Servo.h>
 
 //Clavijas a la que esta conectado el potenciador L298N
 int IN3 = 5; 
@@ -17,6 +18,10 @@ int PIN_ECO=13;
 int duracion=0;
 int distancia=0;
 
+//Servo que movera nuestro ultrasonico para detectar todos los obstaculos
+Servo servo;
+
+int cont=10;
 //Boolean para saber cuando hace falta ir hacia delante o girar
 boolean estaGirando=true;
 
@@ -34,7 +39,8 @@ void setup()
   //Configuramos los pins del modulo ultrasonico
   pinMode(PIN_TRIG,OUTPUT);
   pinMode(PIN_ECO,INPUT);
-
+  
+   servo.attach(11);
 }
 
 //////////////////////////////
@@ -42,6 +48,10 @@ void setup()
 //////////////////////////////
 void loop()
 {
+  //Reinicio del servo
+  if(cont==90){
+    cont=10;
+  }
   //Hacemos el disparo 
   digitalWrite(PIN_TRIG,LOW);
   delayMicroseconds(2);
@@ -82,4 +92,8 @@ void loop()
     digitalWrite (IN6, LOW);
   
   }
+  //Movemos el servo 10º mas
+  cont=cont+10;
+  servo.write(cont);
+  delay(300);
 }
