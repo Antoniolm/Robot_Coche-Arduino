@@ -159,32 +159,36 @@ int detectarDistanciaObstaculo(){
 void buscarObstaculo(){
   int angleBusqueda=10;
   int dist;
-  boolean ladoDerecha=false ,ladoIzquierdo=false;
+  boolean ladoDerecho=false ,ladoIzquierdo=false;
   while(angleBusqueda<50){
     //Posicionamos nuestro servo
     servo.write(angleBusqueda);
     dist=detectarDistanciaObstaculo(); //detectamos obstaculos
     
-    if(distancia>0 && distancia<=50){
+    if(distancia>0 && distancia<=50){ //Si hay obstaculo
+      //Comprobamos si es el lado derecho
       if(angleBusqueda>=10 && angleBusqueda<=20){
-        girarDerecha();
-      }
+        ladoDerecho=true;
+      }//O si es el lado izquierdo
       else if(angleBusqueda>20 && angleBusqueda<=40){
-        //int rand=random(0,2);
-        //if(rand==0) girarDerecha();
-        //else 
-        girarIzquierda();
-      }
-      /*else if(angleBusqueda>40 && angleBusqueda<=60){
-        girarIzquierda();
-      }*/
-      
+        ladoIzquierdo=true;
+      }      
     }
     
     //Aumentamos el angulo
     angleBusqueda=angleBusqueda+10;
     delay(200);
   }
+  //Segun que lados haya detectado realizamos un giro u otro
+  if(ladoDerecho && ladoIzquierdo){
+     int rand=random(0,2);
+     if(rand==0)girarDerecha();
+     else girarIzquierda();
+  }
+  else if(ladoDerecho) girarIzquierda();
+  else if(ladoIzquierdo) girarDerecha();
+      
+  
   
 }
 
