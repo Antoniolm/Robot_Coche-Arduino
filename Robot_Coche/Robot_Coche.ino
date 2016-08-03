@@ -165,7 +165,7 @@ void acelerar(){
     digitalWrite (IN4, HIGH);
     digitalWrite (IN3, LOW);
     digitalWrite (IN6, HIGH); 
-    delay(400);
+    delay(450);
 
     //Detenemos la aceleracion 
     digitalWrite (IN4, LOW);   
@@ -201,7 +201,7 @@ int detectarDistanciaObstaculo(){
 
 salidaComprobacion buscarObstaculo(){
   int angleBusqueda=45;
-  int dist;
+  int dist=0;
   salidaComprobacion salida=noGiro;
   boolean ladoDerecho=false ,ladoIzquierdo=false;
   while(angleBusqueda<=135){
@@ -209,28 +209,29 @@ salidaComprobacion buscarObstaculo(){
     servo.write(angleBusqueda);
     dist=detectarDistanciaObstaculo(); //detectamos obstaculos
     
-    if(distancia>0 && distancia<=25){ //Si hay obstaculo
+    if(dist>0 && dist<=25){ //Si hay obstaculo
       //Comprobamos si es el lado derecho
-      if(angleBusqueda>=10 && angleBusqueda<=20){
+      if(angleBusqueda>=45 && angleBusqueda<=95){
         ladoDerecho=true;
       }//O si es el lado izquierdo
-      else if(angleBusqueda>20 && angleBusqueda<=40){
+      else if(angleBusqueda>95 && angleBusqueda<=135){
         ladoIzquierdo=true;
       }      
     }
     
     //Aumentamos el angulo
     angleBusqueda=angleBusqueda+10;
-    delay(200);
+    delay(50);
+    
   }
   //Segun que lados haya detectado realizamos un giro u otro
   if(ladoDerecho && ladoIzquierdo){
      int rand=random(0,2);
-     if(rand==0)girarDerecha();
-     else girarIzquierda();
+     if(rand==0)salida=giroDerecha;
+     else salida=giroIzquierda;;
   }
-  else if(ladoDerecho) girarIzquierda();
-  else if(ladoIzquierdo) girarDerecha();
+  else if(ladoDerecho) salida=giroDerecha;
+  else if(ladoIzquierdo) salida=giroIzquierda;
       
   return salida;
   
