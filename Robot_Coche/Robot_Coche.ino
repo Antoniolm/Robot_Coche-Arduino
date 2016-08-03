@@ -17,10 +17,30 @@ int PIN_ECO=13;
 
 int distancia=0;
 
+//Enum para la alida de buscarObstaculo
+enum salidaComprobacion{   noGiro,  giroDerecha,   giroIzquierda };
+
+//Definimos buscaObstaculo con return enum
+salidaComprobacion buscarObstaculo();
+
+//Creamos un objeto salidaComprobacion
+salidaComprobacion giro=noGiro;
+
+//Creamos el enum de estados 
+enum Estado {
+  detectandoObstaculos, //Estado para que el robot compruebe su alrededor
+  girando, //Estado para cuando el robot necesite girar
+  acelerando //EStado para cuando el robot vaya en linea recta
+
+};
+
+//Creamos un objeto de enum estados
+Estado state=detectandoObstaculos;
+
 //Servo que movera nuestro ultrasonico para detectar todos los obstaculos
 Servo servo;
 
-int angle=-10;
+int angle=0;
 //Boolean para saber cuando hace falta ir hacia delante o girar
 boolean estaGirando=true;
 
@@ -47,34 +67,56 @@ void setup()
 //////////////////////////////
 void loop()
 {
-  //Reinicio del servo
-  if(angle==60){
-    angle=-10;
-  }
-  //Detectamos obstaculos 
-  distancia=detectarDistanciaObstaculo();
   
-  //Si no tiene cercanos (50cm) 
-  //Caso -distancia se tienen en cuenta por fallos de lectura de
-  //nuestro sensor ultrasonico
-  if(estaGirando && (distancia >50 || distancia < 0)){
-    // Motor va hacia delante
-    digitalWrite (IN4, HIGH);
-    digitalWrite (IN6, HIGH); 
-    estaGirando=false; 
-  }
-  else if(distancia>0 && distancia<=50){ //Si tenemos un obstaculo a menos de 50cm
+  switch(state){
   
-    estaGirando=true;
+    /////////////////////////
+    //Despues de realizar un giro entramos en este estado en el cual se realiza un sondeo
+    //de obstaculos con el robot parado. En este sondeo se comprueba en que angulos hay obstaculos
+    //y se selecciona una posicion de giro. En el caso de no existir obstaculo alguno el robot 
+    //pasara al estado acelerando
+    ////////////////////////
+    case detectandoObstaculos:
+        giro=buscarObstaculo();
+        if(giro!=noGiro)
+          state=girando;//cambiamos estado
+        else
+          state=acelerando; 
+          
+    break;
     
-    girarDerecha();
-    buscarObstaculo();
+    /////////////////////////
+    //
+    //
+    ////////////////////////
+    case acelerando:
+        // Motor va hacia delante
+
+        estaGirando=false; 
+        acelerar();
+        //Cambiamos de estado
+        state=detectandoObstaculos;
+        //Reiniciamos el angulo del servo
+    break;
+    
+    /////////////////////////
+    //
+    //
+    ////////////////////////
+    case girando:
+        estaGirando=true;
+        if(giro==giroDerecha)
+            girarDerecha();
+        else
+            girarIzquierda();
+        state=detectandoObstaculos;
+    
+    break;
   
-  }
-  //Movemos el servo 10º mas
-  angle=angle+10;
-  servo.write(angle);
-  delay(200);
+  
+  
+  };
+  
 }
 
 /**
@@ -92,6 +134,7 @@ void girarDerecha(){
     //Detenemos el giro 
     digitalWrite (IN3, LOW);   
     digitalWrite (IN6, LOW);
+   
 }
 
 
@@ -116,17 +159,17 @@ void girarIzquierda(){
 *  Metodo para girar 180grados el robot
 *
 */
-void girarAtras(){
-    //Motor gira hacia la derecha
+void acelerar(){
+    //Motor acelera
     digitalWrite (IN3, LOW);
-    digitalWrite (IN4, HIGH);   
-    digitalWrite (IN5, HIGH);
-    digitalWrite (IN6, LOW);
-    delay(500);
+    digitalWrite (IN4, HIGH);
+    digitalWrite (IN3, LOW);
+    digitalWrite (IN6, HIGH); 
+    delay(400);
 
-    //Detenemos el giro 
+    //Detenemos la aceleracion 
     digitalWrite (IN4, LOW);   
-    digitalWrite (IN5, LOW);
+    digitalWrite (IN6, LOW);
 }
 /**
 *  Metodo que nos permite saber la distancia a la que se encuentra nuestro obstaculo
@@ -156,16 +199,17 @@ int detectarDistanciaObstaculo(){
 *
 */
 
-void buscarObstaculo(){
-  int angleBusqueda=10;
+salidaComprobacion buscarObstaculo(){
+  int angleBusqueda=45;
   int dist;
+  salidaComprobacion salida=noGiro;
   boolean ladoDerecho=false ,ladoIzquierdo=false;
-  while(angleBusqueda<50){
+  while(angleBusqueda<=135){
     //Posicionamos nuestro servo
     servo.write(angleBusqueda);
     dist=detectarDistanciaObstaculo(); //detectamos obstaculos
     
-    if(distancia>0 && distancia<=50){ //Si hay obstaculo
+    if(distancia>0 && distancia<=25){ //Si hay obstaculo
       //Comprobamos si es el lado derecho
       if(angleBusqueda>=10 && angleBusqueda<=20){
         ladoDerecho=true;
@@ -188,7 +232,7 @@ void buscarObstaculo(){
   else if(ladoDerecho) girarIzquierda();
   else if(ladoIzquierdo) girarDerecha();
       
-  
+  return salida;
   
 }
 
