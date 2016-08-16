@@ -86,8 +86,7 @@ void loop()
     break;
     
     /////////////////////////
-    //
-    //
+    //Estado en el que nuestro robot acelera durante un cierto periodo de tiempo
     ////////////////////////
     case acelerando:
         // Motor va hacia delante
@@ -100,8 +99,8 @@ void loop()
     break;
     
     /////////////////////////
-    //
-    //
+    //Estado en el que nuestro robot gira hacia la derecha o izquierda segun
+    //donde se haya detectado el obstaculo
     ////////////////////////
     case girando:
         estaGirando=true;
@@ -200,21 +199,21 @@ int detectarDistanciaObstaculo(){
 */
 
 salidaComprobacion buscarObstaculo(){
-  int angleBusqueda=45;
+  int angleBusqueda=70;
   int dist=0;
   salidaComprobacion salida=noGiro;
   boolean ladoDerecho=false ,ladoIzquierdo=false;
-  while(angleBusqueda<=135){
+  while(angleBusqueda<=110){
     //Posicionamos nuestro servo
     servo.write(angleBusqueda);
     dist=detectarDistanciaObstaculo(); //detectamos obstaculos
     
     if(dist>0 && dist<=25){ //Si hay obstaculo
       //Comprobamos si es el lado derecho
-      if(angleBusqueda>=45 && angleBusqueda<=95){
+      if(angleBusqueda>=70 && angleBusqueda<=90){
         ladoDerecho=true;
       }//O si es el lado izquierdo
-      else if(angleBusqueda>95 && angleBusqueda<=135){
+      else if(angleBusqueda>90 && angleBusqueda<=110){
         ladoIzquierdo=true;
       }      
     }
